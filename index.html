@@ -77,14 +77,14 @@ h3{margin:14px 0 8px;font-size:1em;opacity:.85}
 
 .level{text-align:center;margin-top:8px;font-weight:bold}
 
-.message,.hypotheses{
+.message,.hypotheses,.actions{
   margin-top:10px;
   padding:12px;
   border-radius:16px;
   background:rgba(0,0,0,.3);
 }
 
-.hypotheses ul{padding-left:18px;margin-top:6px}
+.hypotheses ul,.actions ul{padding-left:18px;margin-top:6px}
 
 button{
   margin-top:16px;
@@ -112,6 +112,7 @@ button{
 <h1>🩺 SymptoCheck</h1>
 <p class="subtitle">Analyse structurée des symptômes</p>
 
+<!-- ===== TABLEAU 1 : SYMPTÔMES (INCHANGÉ) ===== -->
 <section>
 <h2>📋 Symptômes</h2>
 
@@ -155,13 +156,32 @@ button{
 <button onclick="resetAll()">Réinitialiser</button>
 </section>
 
+<!-- ===== TABLEAU 2 : ACTIONS & DÉCISIONS ===== -->
+<section>
+<h2>🧭 Que faire maintenant ?</h2>
+
+<div class="actions" id="actions1">
+<strong>1️⃣ Actions immédiates</strong>
+<ul>
+  <li>Analyse en attente</li>
+</ul>
+</div>
+
+<div class="actions" id="actions2">
+<strong>2️⃣ Quand consulter</strong>
+<ul>
+  <li>Analyse en attente</li>
+</ul>
+</div>
+</section>
+
 <div class="footer">
 ⚠️ Outil informatif – ne remplace pas un avis médical
 </div>
 </div>
 
 <script>
-const categories = {
+const categories={
   general:["Fatigue","Frissons","Sueurs nocturnes","Perte d’appétit"],
   pain:["Mal de tête","Douleurs musculaires","Douleurs articulaires","Douleur thoracique","Douleur abdominale"],
   resp:["Toux","Mal de gorge","Nez qui coule","Nez bouché","Essoufflement","Perte de l’odorat","Perte du goût"],
@@ -183,17 +203,15 @@ function createSymptoms(list,id){
   });
 }
 
-createSymptoms(categories.general,"general");
-createSymptoms(categories.pain,"pain");
-createSymptoms(categories.resp,"resp");
-createSymptoms(categories.digest,"digest");
-createSymptoms(categories.neuro,"neuro");
+Object.entries(categories).forEach(([k,v])=>createSymptoms(v,k));
 
 const blocks=document.querySelectorAll(".symptom-block");
 const bar=document.getElementById("bar");
 const level=document.getElementById("level");
 const message=document.getElementById("message");
 const hypo=document.getElementById("hypotheses");
+const a1=document.getElementById("actions1").querySelector("ul");
+const a2=document.getElementById("actions2").querySelector("ul");
 
 blocks.forEach(b=>{
   const btn=b.querySelector(".symptom");
@@ -225,20 +243,38 @@ function update(){
     const n=b.dataset.name;
     active.push(n);
 
-    if(n==="Fièvre"){
-      score+=v>=40?40:v>=39?25:v>=38?15:5;
-    } else score+=v*2.3;
+    if(n==="Fièvre") score+=v>=40?40:v>=39?25:v>=38?15:5;
+    else score+=v*2.3;
   });
 
   const p=Math.min(score,100);
   bar.style.width=p+"%";
 
-  if(p<30){bar.style.background="#22c55e";level.textContent="Faible";message.textContent="Repos conseillé."}
-  else if(p<65){bar.style.background="#f59e0b";level.textContent="Modéré";message.textContent="Surveillance recommandée."}
-  else{bar.style.background="#ef4444";level.textContent="Élevé";message.textContent="Avis médical conseillé."}
+  a1.innerHTML="";
+  a2.innerHTML="";
+
+  if(p<30){
+    bar.style.background="#22c55e";
+    level.textContent="Faible";
+    message.textContent="Repos conseillé.";
+    a1.innerHTML="<li>Repos</li><li>Hydratation</li><li>Surveillance légère</li>";
+    a2.innerHTML="<li>Si symptômes persistent > 3 jours</li>";
+  } else if(p<65){
+    bar.style.background="#f59e0b";
+    level.textContent="Modéré";
+    message.textContent="Surveillance recommandée.";
+    a1.innerHTML="<li>Repos strict</li><li>Éviter efforts</li><li>Surveiller l’évolution</li>";
+    a2.innerHTML="<li>Consulter si aggravation</li><li>Fièvre persistante</li>";
+  } else {
+    bar.style.background="#ef4444";
+    level.textContent="Élevé";
+    message.textContent="Avis médical conseillé.";
+    a1.innerHTML="<li>Ne pas rester seul</li><li>Limiter déplacements</li>";
+    a2.innerHTML="<li>Consulter rapidement</li><li>Urgences si gêne respiratoire</li>";
+  }
 
   hypo.innerHTML="";
-  if(active.includes("Fièvre") && active.includes("Toux")) hypo.innerHTML+="<li>Infection virale possible</li>";
+  if(active.includes("Fièvre")&&active.includes("Toux")) hypo.innerHTML+="<li>Infection virale possible</li>";
   if(active.includes("Nausées")||active.includes("Diarrhée")) hypo.innerHTML+="<li>Trouble digestif</li>";
   if(active.includes("Essoufflement")||active.includes("Douleur thoracique")) hypo.innerHTML+="<li>Surveillance respiratoire</li>";
   if(!hypo.innerHTML) hypo.innerHTML="<li>Symptômes non spécifiques</li>";
@@ -253,11 +289,15 @@ function resetAll(){
   level.textContent="Aucun symptôme";
   message.textContent="Sélectionne des symptômes.";
   hypo.innerHTML="<li>Aucune hypothèse</li>";
+  a1.innerHTML="<li>Analyse en attente</li>";
+  a2.innerHTML="<li>Analyse en attente</li>";
 }
 </script>
 
 </body>
 </html>
+
+
 
 
 
