@@ -6,20 +6,16 @@
 <title>SymptoCheck</title>
 
 <style>
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
   min-height: 100vh;
-  font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+  font-family: system-ui, sans-serif;
   color: white;
   background:
     radial-gradient(circle at top, rgba(56,189,248,0.2), transparent 40%),
     radial-gradient(circle at bottom, rgba(239,68,68,0.2), transparent 40%),
-    linear-gradient(180deg, #020617, #020617);
+    #020617;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -32,48 +28,21 @@ body {
   background: rgba(255,255,255,0.12);
   backdrop-filter: blur(18px);
   box-shadow: 0 30px 80px rgba(0,0,0,0.6);
-  animation: appear 0.7s ease;
 }
 
-@keyframes appear {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+h1 { text-align: center; }
+.subtitle { text-align: center; opacity: 0.8; margin-bottom: 20px; }
 
-h1 {
-  text-align: center;
-  margin-bottom: 8px;
-}
-
-.subtitle {
-  text-align: center;
-  opacity: 0.8;
-  margin-bottom: 20px;
-}
-
-section {
-  margin-top: 22px;
-}
-
-section h2 {
-  font-size: 1.15em;
-  margin-bottom: 10px;
-}
+section { margin-top: 22px; }
+h2 { margin-bottom: 10px; }
 
 /* Symptômes */
-.symptoms {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
 .symptom {
-  padding: 8px 12px;
+  padding: 10px 14px;
   border-radius: 14px;
   background: rgba(0,0,0,0.35);
   cursor: pointer;
-  transition: 0.2s;
-  font-size: 0.9em;
+  margin-bottom: 10px;
 }
 
 .symptom.active {
@@ -82,11 +51,23 @@ section h2 {
   font-weight: bold;
 }
 
-/* Barre gravité */
-.bar-container {
-  margin-top: 14px;
+/* Slider */
+.slider-box {
+  margin-top: 10px;
+  display: none;
 }
 
+.slider-box input {
+  width: 100%;
+}
+
+.slider-value {
+  text-align: center;
+  margin-top: 6px;
+  font-weight: bold;
+}
+
+/* Barre */
 .bar {
   width: 100%;
   height: 16px;
@@ -99,7 +80,7 @@ section h2 {
   height: 100%;
   width: 0%;
   background: green;
-  transition: width 0.6s ease, background 0.4s ease;
+  transition: 0.6s;
 }
 
 .level-text {
@@ -108,17 +89,14 @@ section h2 {
   font-weight: bold;
 }
 
-/* Message */
 .message {
-  margin-top: 12px;
+  margin-top: 10px;
   padding: 12px;
   border-radius: 16px;
   background: rgba(0,0,0,0.3);
-  font-size: 0.95em;
   text-align: center;
 }
 
-/* Bouton reset */
 button {
   margin-top: 16px;
   width: 100%;
@@ -126,17 +104,12 @@ button {
   border-radius: 16px;
   border: none;
   background: linear-gradient(135deg, #38bdf8, #818cf8);
-  color: #020617;
   font-weight: bold;
   cursor: pointer;
 }
 
-button:hover {
-  opacity: 0.9;
-}
-
 .footer {
-  margin-top: 16px;
+  margin-top: 14px;
   font-size: 0.75em;
   opacity: 0.7;
   text-align: center;
@@ -147,116 +120,109 @@ button:hover {
 <body>
 
 <div class="app">
-
 <h1>🩺 SymptoCheck</h1>
-<p class="subtitle">Analyse simple de symptômes</p>
+<p class="subtitle">Analyse simple et précise</p>
 
 <section>
-<h2>🌡️ Symptômes généraux</h2>
-<div class="symptoms">
-  <div class="symptom" data-weight="10">Fièvre</div>
-  <div class="symptom" data-weight="5">Fatigue</div>
-  <div class="symptom" data-weight="10">Frissons</div>
-  <div class="symptom" data-weight="5">Perte d’appétit</div>
-</div>
-</section>
+<h2>🌡️ Fièvre</h2>
 
-<section>
-<h2>🤧 Respiratoire / ORL</h2>
-<div class="symptoms">
-  <div class="symptom" data-weight="5">Nez bouché</div>
-  <div class="symptom" data-weight="5">Mal de gorge</div>
-  <div class="symptom" data-weight="10">Toux</div>
-  <div class="symptom" data-weight="20">Essoufflement</div>
-</div>
-</section>
+<div class="symptom" id="feverBtn">Fièvre</div>
 
-<section>
-<h2>🤕 Douleurs</h2>
-<div class="symptoms">
-  <div class="symptom" data-weight="5">Mal de tête</div>
-  <div class="symptom" data-weight="10">Douleurs musculaires</div>
-  <div class="symptom" data-weight="10">Douleur abdominale</div>
+<div class="slider-box" id="feverBox">
+  <input type="range" min="36" max="41" step="0.1" value="38" id="feverRange">
+  <div class="slider-value" id="feverValue">38.0 °C</div>
 </div>
+
 </section>
 
 <section>
 <h2>📊 Gravité estimée</h2>
 
-<div class="bar-container">
-  <div class="bar">
-    <div class="bar-fill" id="barFill"></div>
-  </div>
+<div class="bar">
+  <div class="bar-fill" id="bar"></div>
 </div>
 
-<div class="level-text" id="levelText">Aucun symptôme sélectionné</div>
-<div class="message" id="message">
-Sélectionne des symptômes pour obtenir une estimation.
-</div>
+<div class="level-text" id="level">Aucun symptôme</div>
+<div class="message" id="msg">Sélectionne un symptôme.</div>
 
 <button onclick="resetAll()">Réinitialiser</button>
-
 </section>
 
 <div class="footer">
 ⚠️ Outil informatif – ne remplace pas un avis médical
 </div>
-
 </div>
 
 <script>
-const symptoms = document.querySelectorAll(".symptom");
-const bar = document.getElementById("barFill");
-const levelText = document.getElementById("levelText");
-const message = document.getElementById("message");
+const feverBtn = document.getElementById("feverBtn");
+const feverBox = document.getElementById("feverBox");
+const feverRange = document.getElementById("feverRange");
+const feverValue = document.getElementById("feverValue");
 
-symptoms.forEach(symptom => {
-  symptom.addEventListener("click", () => {
-    symptom.classList.toggle("active");
-    update();
-  });
-});
+const bar = document.getElementById("bar");
+const level = document.getElementById("level");
+const msg = document.getElementById("msg");
+
+let feverActive = false;
+
+feverBtn.onclick = () => {
+  feverActive = !feverActive;
+  feverBtn.classList.toggle("active");
+  feverBox.style.display = feverActive ? "block" : "none";
+  update();
+};
+
+feverRange.oninput = () => {
+  feverValue.textContent = feverRange.value + " °C";
+  update();
+};
 
 function update() {
   let score = 0;
-  symptoms.forEach(s => {
-    if (s.classList.contains("active")) {
-      score += Number(s.dataset.weight);
-    }
-  });
+
+  if (feverActive) {
+    let t = Number(feverRange.value);
+    if (t < 38) score += 5;
+    else if (t < 39) score += 15;
+    else if (t < 40) score += 25;
+    else score += 40;
+  }
 
   let percent = Math.min(score, 100);
   bar.style.width = percent + "%";
 
   if (percent === 0) {
-    bar.style.background = "green";
-    levelText.textContent = "Aucun symptôme";
-    message.textContent = "Situation rassurante.";
-  } 
-  else if (percent < 35) {
     bar.style.background = "#22c55e";
-    levelText.textContent = "Gravité faible";
-    message.textContent = "Repos et hydratation conseillés.";
-  } 
-  else if (percent < 65) {
+    level.textContent = "Rassurant";
+    msg.textContent = "Pas de signe inquiétant.";
+  } else if (percent < 35) {
+    bar.style.background = "#22c55e";
+    level.textContent = "Faible";
+    msg.textContent = "Repos recommandé.";
+  } else if (percent < 65) {
     bar.style.background = "#f59e0b";
-    levelText.textContent = "Gravité modérée";
-    message.textContent = "Surveille l’évolution des symptômes.";
-  } 
-  else {
+    level.textContent = "Modéré";
+    msg.textContent = "Surveillance conseillée.";
+  } else {
     bar.style.background = "#ef4444";
-    levelText.textContent = "Gravité élevée";
-    message.textContent = "Il est conseillé de consulter un professionnel de santé.";
+    level.textContent = "Élevé";
+    msg.textContent = "Consulte un professionnel de santé.";
   }
 }
 
 function resetAll() {
-  symptoms.forEach(s => s.classList.remove("active"));
-  update();
+  feverActive = false;
+  feverBtn.classList.remove("active");
+  feverBox.style.display = "none";
+  bar.style.width = "0%";
+  level.textContent = "Aucun symptôme";
+  msg.textContent = "Sélectionne un symptôme.";
 }
 </script>
 
 </body>
 </html>
+
+
 
 
