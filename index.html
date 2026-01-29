@@ -112,7 +112,6 @@ button{
 <h1>🩺 SymptoCheck</h1>
 <p class="subtitle">Analyse structurée des symptômes</p>
 
-<!-- ===== TABLEAU 1 : SYMPTÔMES (INCHANGÉ) ===== -->
 <section>
 <h2>📋 Symptômes</h2>
 
@@ -156,22 +155,17 @@ button{
 <button onclick="resetAll()">Réinitialiser</button>
 </section>
 
-<!-- ===== TABLEAU 2 : ACTIONS & DÉCISIONS ===== -->
 <section>
 <h2>🧭 Que faire maintenant ?</h2>
 
 <div class="actions" id="actions1">
 <strong>1️⃣ Actions immédiates</strong>
-<ul>
-  <li>Analyse en attente</li>
-</ul>
+<ul><li>Analyse en attente</li></ul>
 </div>
 
 <div class="actions" id="actions2">
 <strong>2️⃣ Quand consulter</strong>
-<ul>
-  <li>Analyse en attente</li>
-</ul>
+<ul><li>Analyse en attente</li></ul>
 </div>
 </section>
 
@@ -249,34 +243,38 @@ function update(){
 
   const p=Math.min(score,100);
   bar.style.width=p+"%";
-
   a1.innerHTML="";
   a2.innerHTML="";
 
   if(p<30){
     bar.style.background="#22c55e";
     level.textContent="Faible";
-    message.textContent="Repos conseillé.";
-    a1.innerHTML="<li>Repos</li><li>Hydratation</li><li>Surveillance légère</li>";
-    a2.innerHTML="<li>Si symptômes persistent > 3 jours</li>";
-  } else if(p<65){
+    message.textContent=
+      "Les symptômes déclarés sont peu nombreux ou peu intenses. L’état général semble stable. Une récupération naturelle est probable avec du repos, une bonne hydratation et une surveillance légère de l’évolution.";
+    a1.innerHTML="<li>Repos et sommeil suffisant</li><li>Boire régulièrement</li><li>Éviter les efforts inutiles</li><li>Observer l’évolution sur 48–72h</li>";
+    a2.innerHTML="<li>Consulter si les symptômes persistent plus de 3 jours</li><li>Consulter si un nouveau symptôme apparaît</li>";
+  }
+  else if(p<65){
     bar.style.background="#f59e0b";
     level.textContent="Modéré";
-    message.textContent="Surveillance recommandée.";
-    a1.innerHTML="<li>Repos strict</li><li>Éviter efforts</li><li>Surveiller l’évolution</li>";
-    a2.innerHTML="<li>Consulter si aggravation</li><li>Fièvre persistante</li>";
-  } else {
+    message.textContent=
+      "Plusieurs symptômes sont présents et peuvent indiquer une infection, une fatigue importante ou un déséquilibre temporaire. Une attention particulière est recommandée afin d’éviter une aggravation.";
+    a1.innerHTML="<li>Repos strict</li><li>Limiter les activités physiques</li><li>Hydratation renforcée</li><li>Surveiller température et symptômes</li>";
+    a2.innerHTML="<li>Consulter si la fièvre persiste</li><li>Consulter en cas d’aggravation</li><li>Consulter si douleur inhabituelle</li>";
+  }
+  else{
     bar.style.background="#ef4444";
     level.textContent="Élevé";
-    message.textContent="Avis médical conseillé.";
-    a1.innerHTML="<li>Ne pas rester seul</li><li>Limiter déplacements</li>";
-    a2.innerHTML="<li>Consulter rapidement</li><li>Urgences si gêne respiratoire</li>";
+    message.textContent=
+      "Les symptômes rapportés sont nombreux ou sévères. Cela peut correspondre à une situation nécessitant une évaluation médicale. Une prise en charge adaptée permettrait de réduire les risques et de mieux orienter le traitement.";
+    a1.innerHTML="<li>Repos immédiat</li><li>Éviter de rester seul</li><li>Limiter déplacements et efforts</li>";
+    a2.innerHTML="<li>Consulter rapidement un professionnel de santé</li><li>Urgences si gêne respiratoire</li><li>Urgences si douleur thoracique</li>";
   }
 
   hypo.innerHTML="";
   if(active.includes("Fièvre")&&active.includes("Toux")) hypo.innerHTML+="<li>Infection virale possible</li>";
-  if(active.includes("Nausées")||active.includes("Diarrhée")) hypo.innerHTML+="<li>Trouble digestif</li>";
-  if(active.includes("Essoufflement")||active.includes("Douleur thoracique")) hypo.innerHTML+="<li>Surveillance respiratoire</li>";
+  if(active.includes("Nausées")||active.includes("Diarrhée")) hypo.innerHTML+="<li>Trouble digestif possible</li>";
+  if(active.includes("Essoufflement")||active.includes("Douleur thoracique")) hypo.innerHTML+="<li>Surveillance respiratoire recommandée</li>";
   if(!hypo.innerHTML) hypo.innerHTML="<li>Symptômes non spécifiques</li>";
 }
 
@@ -296,6 +294,8 @@ function resetAll(){
 
 </body>
 </html>
+
+
 
 
 
