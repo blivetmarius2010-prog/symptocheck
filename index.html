@@ -6,112 +6,102 @@
 <title>SymptoCheck</title>
 
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
+*{box-sizing:border-box;margin:0;padding:0}
 
-body {
-  min-height: 100vh;
-  font-family: system-ui, sans-serif;
-  color: white;
+body{
+  min-height:100vh;
+  font-family:system-ui,sans-serif;
+  color:white;
   background:
-    radial-gradient(circle at top, rgba(56,189,248,0.2), transparent 40%),
-    radial-gradient(circle at bottom, rgba(239,68,68,0.2), transparent 40%),
+    radial-gradient(circle at top, rgba(56,189,248,.2), transparent 40%),
+    radial-gradient(circle at bottom, rgba(239,68,68,.2), transparent 40%),
     #020617;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display:flex;
+  justify-content:center;
+  align-items:center;
 }
 
-.app {
-  width: 430px;
-  max-height: 90vh;
-  overflow-y: auto;
-  padding: 28px;
-  border-radius: 28px;
-  background: rgba(255,255,255,0.12);
-  backdrop-filter: blur(18px);
-  box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+.app{
+  width:440px;
+  max-height:90vh;
+  overflow-y:auto;
+  padding:26px;
+  border-radius:28px;
+  background:rgba(255,255,255,.12);
+  backdrop-filter:blur(18px);
+  box-shadow:0 30px 80px rgba(0,0,0,.6);
 }
 
-h1 { text-align: center; }
-.subtitle { text-align: center; opacity: 0.8; margin-bottom: 20px; }
+h1{text-align:center}
+.subtitle{text-align:center;opacity:.8;margin-bottom:18px}
 
-section { margin-top: 22px; }
-h2 { margin-bottom: 10px; }
+section{margin-top:22px}
+h2{margin-bottom:10px}
+h3{margin:14px 0 8px;font-size:1em;opacity:.85}
 
-.symptom-block { margin-bottom: 12px; }
+.symptom-block{margin-bottom:10px}
 
-.symptom {
-  padding: 10px 14px;
-  border-radius: 14px;
-  background: rgba(0,0,0,0.35);
-  cursor: pointer;
-  transition: 0.2s;
+.symptom{
+  padding:10px 14px;
+  border-radius:14px;
+  background:rgba(0,0,0,.35);
+  cursor:pointer;
+  transition:.2s;
 }
 
-.symptom.active {
-  background: linear-gradient(135deg, #38bdf8, #818cf8);
-  color: #020617;
-  font-weight: bold;
+.symptom.active{
+  background:linear-gradient(135deg,#38bdf8,#818cf8);
+  color:#020617;
+  font-weight:bold;
 }
 
-.slider { margin-top: 8px; display: none; }
-.slider input { width: 100%; }
+.slider{display:none;margin-top:6px}
+.slider input{width:100%}
 
-.slider-value {
-  text-align: center;
-  font-size: 0.9em;
-  margin-top: 4px;
+.slider-value{text-align:center;font-size:.9em;margin-top:4px}
+
+.bar{
+  width:100%;
+  height:16px;
+  background:rgba(255,255,255,.2);
+  border-radius:10px;
+  overflow:hidden;
 }
 
-.bar {
-  width: 100%;
-  height: 16px;
-  background: rgba(255,255,255,0.2);
-  border-radius: 10px;
-  overflow: hidden;
+.bar-fill{
+  height:100%;
+  width:0%;
+  background:green;
+  transition:.5s;
 }
 
-.bar-fill {
-  height: 100%;
-  width: 0%;
-  background: green;
-  transition: width 0.6s ease, background 0.4s ease;
+.level{text-align:center;margin-top:8px;font-weight:bold}
+
+.message,.hypotheses{
+  margin-top:10px;
+  padding:12px;
+  border-radius:16px;
+  background:rgba(0,0,0,.3);
 }
 
-.level {
-  text-align: center;
-  margin-top: 8px;
-  font-weight: bold;
+.hypotheses ul{padding-left:18px;margin-top:6px}
+
+button{
+  margin-top:16px;
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:16px;
+  background:linear-gradient(135deg,#38bdf8,#818cf8);
+  font-weight:bold;
+  cursor:pointer;
 }
 
-.message, .hypotheses {
-  margin-top: 10px;
-  padding: 12px;
-  border-radius: 16px;
-  background: rgba(0,0,0,0.3);
-}
-
-.hypotheses ul {
-  margin-top: 6px;
-  padding-left: 18px;
-}
-
-button {
-  margin-top: 16px;
-  width: 100%;
-  padding: 12px;
-  border-radius: 16px;
-  border: none;
-  background: linear-gradient(135deg, #38bdf8, #818cf8);
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.footer {
-  margin-top: 14px;
-  font-size: 0.75em;
-  opacity: 0.7;
-  text-align: center;
+.footer{
+  margin-top:14px;
+  font-size:.75em;
+  opacity:.7;
+  text-align:center;
 }
 </style>
 </head>
@@ -120,12 +110,13 @@ button {
 
 <div class="app">
 <h1>🩺 SymptoCheck</h1>
-<p class="subtitle">Analyse détaillée des symptômes</p>
+<p class="subtitle">Analyse structurée des symptômes</p>
 
 <section>
-<h2>🌡️ Symptômes</h2>
+<h2>📋 Symptômes</h2>
 
-<!-- FIEVRE -->
+<h3>🌡️ Généraux</h3>
+
 <div class="symptom-block" data-name="Fièvre">
   <div class="symptom">Fièvre</div>
   <div class="slider">
@@ -134,24 +125,31 @@ button {
   </div>
 </div>
 
-<div id="symptomList"></div>
+<div id="general"></div>
+
+<h3>🤕 Douleurs</h3>
+<div id="pain"></div>
+
+<h3>🤧 ORL / Respiratoire</h3>
+<div id="resp"></div>
+
+<h3>🤢 Digestif</h3>
+<div id="digest"></div>
+
+<h3>🫀 Neurologique & autres</h3>
+<div id="neuro"></div>
 </section>
 
 <section>
 <h2>📊 Gravité estimée</h2>
 
-<div class="bar">
-  <div class="bar-fill" id="bar"></div>
-</div>
-
+<div class="bar"><div class="bar-fill" id="bar"></div></div>
 <div class="level" id="level">Aucun symptôme</div>
 <div class="message" id="message">Sélectionne des symptômes.</div>
 
 <div class="hypotheses">
 <strong>🧠 Hypothèses possibles :</strong>
-<ul id="hypotheses">
-  <li>Aucune hypothèse pour l’instant</li>
-</ul>
+<ul id="hypotheses"><li>Aucune hypothèse</li></ul>
 </div>
 
 <button onclick="resetAll()">Réinitialiser</button>
@@ -163,135 +161,105 @@ button {
 </div>
 
 <script>
-const symptomNames = [
-  "Mal de tête","Fatigue","Toux","Mal de gorge","Nez qui coule",
-  "Essoufflement","Douleurs musculaires","Douleurs articulaires",
-  "Frissons","Nausées","Vomissements","Diarrhée",
-  "Perte d’appétit","Douleur thoracique"
-];
+const categories = {
+  general:["Fatigue","Frissons","Sueurs nocturnes","Perte d’appétit"],
+  pain:["Mal de tête","Douleurs musculaires","Douleurs articulaires","Douleur thoracique","Douleur abdominale"],
+  resp:["Toux","Mal de gorge","Nez qui coule","Nez bouché","Essoufflement","Perte de l’odorat","Perte du goût"],
+  digest:["Nausées","Vomissements","Diarrhée","Ballonnements"],
+  neuro:["Vertiges","Étourdissement","Confusion légère","Sensibilité à la lumière"]
+};
 
-const symptomList = document.getElementById("symptomList");
+function createSymptoms(list,id){
+  const c=document.getElementById(id);
+  list.forEach(n=>{
+    c.innerHTML+=`
+    <div class="symptom-block" data-name="${n}">
+      <div class="symptom">${n}</div>
+      <div class="slider">
+        <input type="range" min="0" max="10" value="3">
+        <div class="slider-value">Intensité : 3 / 10</div>
+      </div>
+    </div>`;
+  });
+}
 
-symptomNames.forEach(name => {
-  symptomList.innerHTML += `
-  <div class="symptom-block" data-name="${name}">
-    <div class="symptom">${name}</div>
-    <div class="slider">
-      <input type="range" min="0" max="10" step="1" value="3">
-      <div class="slider-value">Intensité : 3 / 10</div>
-    </div>
-  </div>`;
-});
+createSymptoms(categories.general,"general");
+createSymptoms(categories.pain,"pain");
+createSymptoms(categories.resp,"resp");
+createSymptoms(categories.digest,"digest");
+createSymptoms(categories.neuro,"neuro");
 
-const blocks = document.querySelectorAll(".symptom-block");
-const bar = document.getElementById("bar");
-const level = document.getElementById("level");
-const message = document.getElementById("message");
-const hypoList = document.getElementById("hypotheses");
+const blocks=document.querySelectorAll(".symptom-block");
+const bar=document.getElementById("bar");
+const level=document.getElementById("level");
+const message=document.getElementById("message");
+const hypo=document.getElementById("hypotheses");
 
-blocks.forEach(block => {
-  const btn = block.querySelector(".symptom");
-  const slider = block.querySelector(".slider");
-  const input = slider.querySelector("input");
-  const value = slider.querySelector(".slider-value");
+blocks.forEach(b=>{
+  const btn=b.querySelector(".symptom");
+  const slider=b.querySelector(".slider");
+  const input=slider.querySelector("input");
+  const value=slider.querySelector(".slider-value");
 
-  btn.onclick = () => {
+  btn.onclick=()=>{
     btn.classList.toggle("active");
-    slider.style.display = btn.classList.contains("active") ? "block" : "none";
+    slider.style.display=btn.classList.contains("active")?"block":"none";
     update();
   };
 
-  input.oninput = () => {
-    value.textContent = btn.textContent === "Fièvre"
-      ? input.value + " °C"
-      : "Intensité : " + input.value + " / 10";
+  input.oninput=()=>{
+    value.textContent=b.dataset.name==="Fièvre"
+      ? input.value+" °C"
+      : "Intensité : "+input.value+" / 10";
     update();
   };
 });
 
-function update() {
-  let score = 0;
-  let active = [];
+function update(){
+  let score=0;
+  let active=[];
 
-  blocks.forEach(b => {
-    const btn = b.querySelector(".symptom");
-    if (!btn.classList.contains("active")) return;
+  blocks.forEach(b=>{
+    if(!b.querySelector(".symptom").classList.contains("active"))return;
+    const v=Number(b.querySelector("input").value);
+    const n=b.dataset.name;
+    active.push(n);
 
-    const v = Number(b.querySelector("input").value);
-    const name = b.dataset.name;
-    active.push({ name, v });
-
-    if (name === "Fièvre") {
-      score += v >= 40 ? 40 : v >= 39 ? 25 : v >= 38 ? 15 : 5;
-    } else {
-      score += v * 2.5;
-    }
+    if(n==="Fièvre"){
+      score+=v>=40?40:v>=39?25:v>=38?15:5;
+    } else score+=v*2.3;
   });
 
-  const percent = Math.min(score, 100);
-  bar.style.width = percent + "%";
+  const p=Math.min(score,100);
+  bar.style.width=p+"%";
 
-  if (percent < 30) {
-    bar.style.background = "#22c55e";
-    level.textContent = "Faible";
-    message.textContent = "Repos conseillé.";
-  } else if (percent < 65) {
-    bar.style.background = "#f59e0b";
-    level.textContent = "Modéré";
-    message.textContent = "Surveillance recommandée.";
-  } else {
-    bar.style.background = "#ef4444";
-    level.textContent = "Élevé";
-    message.textContent = "Consulte un professionnel.";
-  }
+  if(p<30){bar.style.background="#22c55e";level.textContent="Faible";message.textContent="Repos conseillé."}
+  else if(p<65){bar.style.background="#f59e0b";level.textContent="Modéré";message.textContent="Surveillance recommandée."}
+  else{bar.style.background="#ef4444";level.textContent="Élevé";message.textContent="Avis médical conseillé."}
 
-  generateHypotheses(active, percent);
+  hypo.innerHTML="";
+  if(active.includes("Fièvre") && active.includes("Toux")) hypo.innerHTML+="<li>Infection virale possible</li>";
+  if(active.includes("Nausées")||active.includes("Diarrhée")) hypo.innerHTML+="<li>Trouble digestif</li>";
+  if(active.includes("Essoufflement")||active.includes("Douleur thoracique")) hypo.innerHTML+="<li>Surveillance respiratoire</li>";
+  if(!hypo.innerHTML) hypo.innerHTML="<li>Symptômes non spécifiques</li>";
 }
 
-function generateHypotheses(active, percent) {
-  hypoList.innerHTML = "";
-
-  const has = n => active.find(s => s.name === n);
-  const fever = has("Fièvre");
-
-  if (active.length === 0) {
-    hypoList.innerHTML = "<li>Aucune hypothèse</li>";
-    return;
-  }
-
-  if (fever && has("Toux") && has("Fatigue"))
-    hypoList.innerHTML += "<li>Infection virale (grippe, COVID, syndrome grippal)</li>";
-
-  if (has("Mal de gorge") && has("Nez qui coule"))
-    hypoList.innerHTML += "<li>Rhume ou infection ORL</li>";
-
-  if (has("Nausées") || has("Diarrhée"))
-    hypoList.innerHTML += "<li>Trouble digestif ou gastro-entérite</li>";
-
-  if (has("Douleur thoracique") || has("Essoufflement"))
-    hypoList.innerHTML += "<li>Problème respiratoire – avis médical conseillé</li>";
-
-  if (percent > 70)
-    hypoList.innerHTML += "<li>État général préoccupant</li>";
-
-  if (hypoList.innerHTML === "")
-    hypoList.innerHTML = "<li>Symptômes non spécifiques</li>";
-}
-
-function resetAll() {
-  blocks.forEach(b => {
+function resetAll(){
+  blocks.forEach(b=>{
     b.querySelector(".symptom").classList.remove("active");
-    b.querySelector(".slider").style.display = "none";
+    b.querySelector(".slider").style.display="none";
   });
-  bar.style.width = "0%";
-  level.textContent = "Aucun symptôme";
-  message.textContent = "Sélectionne des symptômes.";
-  hypoList.innerHTML = "<li>Aucune hypothèse</li>";
+  bar.style.width="0%";
+  level.textContent="Aucun symptôme";
+  message.textContent="Sélectionne des symptômes.";
+  hypo.innerHTML="<li>Aucune hypothèse</li>";
 }
 </script>
 
 </body>
 </html>
+
+
 
 
 
