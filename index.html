@@ -33,18 +33,12 @@ body {
 }
 
 h1 { text-align: center; }
-.subtitle {
-  text-align: center;
-  opacity: 0.8;
-  margin-bottom: 20px;
-}
+.subtitle { text-align: center; opacity: 0.8; margin-bottom: 20px; }
 
 section { margin-top: 22px; }
 h2 { margin-bottom: 10px; }
 
-.symptom-block {
-  margin-bottom: 12px;
-}
+.symptom-block { margin-bottom: 12px; }
 
 .symptom {
   padding: 10px 14px;
@@ -60,14 +54,8 @@ h2 { margin-bottom: 10px; }
   font-weight: bold;
 }
 
-.slider {
-  margin-top: 8px;
-  display: none;
-}
-
-.slider input {
-  width: 100%;
-}
+.slider { margin-top: 8px; display: none; }
+.slider input { width: 100%; }
 
 .slider-value {
   text-align: center;
@@ -96,12 +84,16 @@ h2 { margin-bottom: 10px; }
   font-weight: bold;
 }
 
-.message {
+.message, .hypotheses {
   margin-top: 10px;
   padding: 12px;
   border-radius: 16px;
   background: rgba(0,0,0,0.3);
-  text-align: center;
+}
+
+.hypotheses ul {
+  margin-top: 6px;
+  padding-left: 18px;
 }
 
 button {
@@ -134,7 +126,7 @@ button {
 <h2>🌡️ Symptômes</h2>
 
 <!-- FIEVRE -->
-<div class="symptom-block" data-type="fever">
+<div class="symptom-block" data-name="Fièvre">
   <div class="symptom">Fièvre</div>
   <div class="slider">
     <input type="range" min="36" max="41" step="0.1" value="38">
@@ -142,18 +134,7 @@ button {
   </div>
 </div>
 
-<!-- AUTRES SYMPTOMES -->
-<script>
-const symptoms = [
-  "Mal de tête","Fatigue","Toux","Mal de gorge","Nez qui coule",
-  "Essoufflement","Douleurs musculaires","Douleurs articulaires",
-  "Frissons","Nausées","Vomissements","Diarrhée",
-  "Perte d’appétit","Douleur thoracique"
-];
-</script>
-
 <div id="symptomList"></div>
-
 </section>
 
 <section>
@@ -166,6 +147,13 @@ const symptoms = [
 <div class="level" id="level">Aucun symptôme</div>
 <div class="message" id="message">Sélectionne des symptômes.</div>
 
+<div class="hypotheses">
+<strong>🧠 Hypothèses possibles :</strong>
+<ul id="hypotheses">
+  <li>Aucune hypothèse pour l’instant</li>
+</ul>
+</div>
+
 <button onclick="resetAll()">Réinitialiser</button>
 </section>
 
@@ -175,11 +163,18 @@ const symptoms = [
 </div>
 
 <script>
+const symptomNames = [
+  "Mal de tête","Fatigue","Toux","Mal de gorge","Nez qui coule",
+  "Essoufflement","Douleurs musculaires","Douleurs articulaires",
+  "Frissons","Nausées","Vomissements","Diarrhée",
+  "Perte d’appétit","Douleur thoracique"
+];
+
 const symptomList = document.getElementById("symptomList");
 
-symptoms.forEach(name => {
+symptomNames.forEach(name => {
   symptomList.innerHTML += `
-  <div class="symptom-block">
+  <div class="symptom-block" data-name="${name}">
     <div class="symptom">${name}</div>
     <div class="slider">
       <input type="range" min="0" max="10" step="1" value="3">
@@ -192,44 +187,42 @@ const blocks = document.querySelectorAll(".symptom-block");
 const bar = document.getElementById("bar");
 const level = document.getElementById("level");
 const message = document.getElementById("message");
+const hypoList = document.getElementById("hypotheses");
 
 blocks.forEach(block => {
   const btn = block.querySelector(".symptom");
-  const sliderBox = block.querySelector(".slider");
-  const input = sliderBox.querySelector("input");
-  const value = sliderBox.querySelector(".slider-value");
+  const slider = block.querySelector(".slider");
+  const input = slider.querySelector("input");
+  const value = slider.querySelector(".slider-value");
 
   btn.onclick = () => {
     btn.classList.toggle("active");
-    sliderBox.style.display = btn.classList.contains("active") ? "block" : "none";
+    slider.style.display = btn.classList.contains("active") ? "block" : "none";
     update();
   };
 
   input.oninput = () => {
-    if (btn.textContent === "Fièvre") {
-      value.textContent = input.value + " °C";
-    } else {
-      value.textContent = "Intensité : " + input.value + " / 10";
-    }
+    value.textContent = btn.textContent === "Fièvre"
+      ? input.value + " °C"
+      : "Intensité : " + input.value + " / 10";
     update();
   };
 });
 
 function update() {
   let score = 0;
+  let active = [];
 
-  blocks.forEach(block => {
-    const btn = block.querySelector(".symptom");
+  blocks.forEach(b => {
+    const btn = b.querySelector(".symptom");
     if (!btn.classList.contains("active")) return;
 
-    const input = block.querySelector("input");
-    const v = Number(input.value);
+    const v = Number(b.querySelector("input").value);
+    const name = b.dataset.name;
+    active.push({ name, v });
 
-    if (btn.textContent === "Fièvre") {
-      if (v < 38) score += 5;
-      else if (v < 39) score += 15;
-      else if (v < 40) score += 25;
-      else score += 40;
+    if (name === "Fièvre") {
+      score += v >= 40 ? 40 : v >= 39 ? 25 : v >= 38 ? 15 : 5;
     } else {
       score += v * 2.5;
     }
@@ -251,21 +244,56 @@ function update() {
     level.textContent = "Élevé";
     message.textContent = "Consulte un professionnel.";
   }
+
+  generateHypotheses(active, percent);
+}
+
+function generateHypotheses(active, percent) {
+  hypoList.innerHTML = "";
+
+  const has = n => active.find(s => s.name === n);
+  const fever = has("Fièvre");
+
+  if (active.length === 0) {
+    hypoList.innerHTML = "<li>Aucune hypothèse</li>";
+    return;
+  }
+
+  if (fever && has("Toux") && has("Fatigue"))
+    hypoList.innerHTML += "<li>Infection virale (grippe, COVID, syndrome grippal)</li>";
+
+  if (has("Mal de gorge") && has("Nez qui coule"))
+    hypoList.innerHTML += "<li>Rhume ou infection ORL</li>";
+
+  if (has("Nausées") || has("Diarrhée"))
+    hypoList.innerHTML += "<li>Trouble digestif ou gastro-entérite</li>";
+
+  if (has("Douleur thoracique") || has("Essoufflement"))
+    hypoList.innerHTML += "<li>Problème respiratoire – avis médical conseillé</li>";
+
+  if (percent > 70)
+    hypoList.innerHTML += "<li>État général préoccupant</li>";
+
+  if (hypoList.innerHTML === "")
+    hypoList.innerHTML = "<li>Symptômes non spécifiques</li>";
 }
 
 function resetAll() {
-  blocks.forEach(block => {
-    block.querySelector(".symptom").classList.remove("active");
-    block.querySelector(".slider").style.display = "none";
+  blocks.forEach(b => {
+    b.querySelector(".symptom").classList.remove("active");
+    b.querySelector(".slider").style.display = "none";
   });
   bar.style.width = "0%";
   level.textContent = "Aucun symptôme";
   message.textContent = "Sélectionne des symptômes.";
+  hypoList.innerHTML = "<li>Aucune hypothèse</li>";
 }
 </script>
 
 </body>
 </html>
+
+
 
 
 
