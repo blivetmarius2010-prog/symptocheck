@@ -22,7 +22,7 @@ body {
 }
 
 .app {
-  width: 380px;
+  width: 400px;
   padding: 28px;
   border-radius: 28px;
   background: rgba(255,255,255,0.12);
@@ -36,13 +36,17 @@ h1 { text-align: center; }
 section { margin-top: 22px; }
 h2 { margin-bottom: 10px; }
 
-/* Symptômes */
+/* SYMPTOMES */
+.symptom-block {
+  margin-bottom: 12px;
+}
+
 .symptom {
   padding: 10px 14px;
   border-radius: 14px;
   background: rgba(0,0,0,0.35);
   cursor: pointer;
-  margin-bottom: 10px;
+  transition: 0.2s;
 }
 
 .symptom.active {
@@ -51,23 +55,23 @@ h2 { margin-bottom: 10px; }
   font-weight: bold;
 }
 
-/* Slider */
-.slider-box {
-  margin-top: 10px;
+/* SLIDER */
+.slider {
+  margin-top: 8px;
   display: none;
 }
 
-.slider-box input {
+.slider input {
   width: 100%;
 }
 
 .slider-value {
   text-align: center;
-  margin-top: 6px;
-  font-weight: bold;
+  font-size: 0.9em;
+  margin-top: 4px;
 }
 
-/* Barre */
+/* BAR */
 .bar {
   width: 100%;
   height: 16px;
@@ -80,12 +84,12 @@ h2 { margin-bottom: 10px; }
   height: 100%;
   width: 0%;
   background: green;
-  transition: 0.6s;
+  transition: width 0.6s ease, background 0.4s ease;
 }
 
-.level-text {
-  margin-top: 8px;
+.level {
   text-align: center;
+  margin-top: 8px;
   font-weight: bold;
 }
 
@@ -121,16 +125,33 @@ button {
 
 <div class="app">
 <h1>🩺 SymptoCheck</h1>
-<p class="subtitle">Analyse simple et précise</p>
+<p class="subtitle">Analyse progressive des symptômes</p>
 
 <section>
-<h2>🌡️ Fièvre</h2>
+<h2>🌡️ Symptômes</h2>
 
-<div class="symptom" id="feverBtn">Fièvre</div>
+<div class="symptom-block" data-type="fever">
+  <div class="symptom">Fièvre</div>
+  <div class="slider">
+    <input type="range" min="36" max="41" step="0.1" value="38">
+    <div class="slider-value">38 °C</div>
+  </div>
+</div>
 
-<div class="slider-box" id="feverBox">
-  <input type="range" min="36" max="41" step="0.1" value="38" id="feverRange">
-  <div class="slider-value" id="feverValue">38.0 °C</div>
+<div class="symptom-block" data-type="pain">
+  <div class="symptom">Mal de tête</div>
+  <div class="slider">
+    <input type="range" min="0" max="10" step="1" value="3">
+    <div class="slider-value">Intensité : 3 / 10</div>
+  </div>
+</div>
+
+<div class="symptom-block" data-type="fatigue">
+  <div class="symptom">Fatigue</div>
+  <div class="slider">
+    <input type="range" min="0" max="10" step="1" value="4">
+    <div class="slider-value">Intensité : 4 / 10</div>
+  </div>
 </div>
 
 </section>
@@ -142,8 +163,8 @@ button {
   <div class="bar-fill" id="bar"></div>
 </div>
 
-<div class="level-text" id="level">Aucun symptôme</div>
-<div class="message" id="msg">Sélectionne un symptôme.</div>
+<div class="level" id="level">Aucun symptôme</div>
+<div class="message" id="message">Sélectionne des symptômes.</div>
 
 <button onclick="resetAll()">Réinitialiser</button>
 </section>
@@ -154,39 +175,53 @@ button {
 </div>
 
 <script>
-const feverBtn = document.getElementById("feverBtn");
-const feverBox = document.getElementById("feverBox");
-const feverRange = document.getElementById("feverRange");
-const feverValue = document.getElementById("feverValue");
-
+const blocks = document.querySelectorAll(".symptom-block");
 const bar = document.getElementById("bar");
 const level = document.getElementById("level");
-const msg = document.getElementById("msg");
+const message = document.getElementById("message");
 
-let feverActive = false;
+blocks.forEach(block => {
+  const btn = block.querySelector(".symptom");
+  const sliderBox = block.querySelector(".slider");
+  const input = sliderBox.querySelector("input");
+  const value = sliderBox.querySelector(".slider-value");
 
-feverBtn.onclick = () => {
-  feverActive = !feverActive;
-  feverBtn.classList.toggle("active");
-  feverBox.style.display = feverActive ? "block" : "none";
-  update();
-};
+  btn.onclick = () => {
+    btn.classList.toggle("active");
+    sliderBox.style.display = btn.classList.contains("active") ? "block" : "none";
+    update();
+  };
 
-feverRange.oninput = () => {
-  feverValue.textContent = feverRange.value + " °C";
-  update();
-};
+  input.oninput = () => {
+    if (block.dataset.type === "fever") {
+      value.textContent = input.value + " °C";
+    } else {
+      value.textContent = "Intensité : " + input.value + " / 10";
+    }
+    update();
+  };
+});
 
 function update() {
   let score = 0;
 
-  if (feverActive) {
-    let t = Number(feverRange.value);
-    if (t < 38) score += 5;
-    else if (t < 39) score += 15;
-    else if (t < 40) score += 25;
-    else score += 40;
-  }
+  blocks.forEach(block => {
+    const btn = block.querySelector(".symptom");
+    if (!btn.classList.contains("active")) return;
+
+    const input = block.querySelector("input");
+    const type = block.dataset.type;
+    const v = Number(input.value);
+
+    if (type === "fever") {
+      if (v < 38) score += 5;
+      else if (v < 39) score += 15;
+      else if (v < 40) score += 25;
+      else score += 40;
+    } else {
+      score += v * 3;
+    }
+  });
 
   let percent = Math.min(score, 100);
   bar.style.width = percent + "%";
@@ -194,34 +229,37 @@ function update() {
   if (percent === 0) {
     bar.style.background = "#22c55e";
     level.textContent = "Rassurant";
-    msg.textContent = "Pas de signe inquiétant.";
+    message.textContent = "Pas de signe inquiétant.";
   } else if (percent < 35) {
     bar.style.background = "#22c55e";
     level.textContent = "Faible";
-    msg.textContent = "Repos recommandé.";
+    message.textContent = "Repos conseillé.";
   } else if (percent < 65) {
     bar.style.background = "#f59e0b";
     level.textContent = "Modéré";
-    msg.textContent = "Surveillance conseillée.";
+    message.textContent = "Surveillance recommandée.";
   } else {
     bar.style.background = "#ef4444";
     level.textContent = "Élevé";
-    msg.textContent = "Consulte un professionnel de santé.";
+    message.textContent = "Consulte un professionnel de santé.";
   }
 }
 
 function resetAll() {
-  feverActive = false;
-  feverBtn.classList.remove("active");
-  feverBox.style.display = "none";
+  blocks.forEach(block => {
+    block.querySelector(".symptom").classList.remove("active");
+    block.querySelector(".slider").style.display = "none";
+  });
   bar.style.width = "0%";
   level.textContent = "Aucun symptôme";
-  msg.textContent = "Sélectionne un symptôme.";
+  message.textContent = "Sélectionne des symptômes.";
 }
 </script>
 
 </body>
 </html>
+
+
 
 
 
